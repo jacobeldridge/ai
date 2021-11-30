@@ -1,5 +1,7 @@
+# from ai.datacreate.objects import CenterLines
 from pygame.draw import line
 from objects import Lines
+from objects import CenterLines
 import pygame
 import random
 from objects import Static
@@ -14,6 +16,7 @@ splitcheck = 0
 colors = [constants.RED, constants.GREEN, constants.BLUE, constants.GOLD]
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 branches = [[],[],[],[]]
+midlines = []
 ## initialize pygame and create window
 pygame.init()
 pygame.mixer.init()  ## For sound
@@ -53,11 +56,12 @@ def startup():
     
     static_sprites.add(starter)
     static_sprites.draw(screen)
+    
 
 
 startup()
 while running:
-    # screen.fill((0,0,0))
+    
     #1 Process input/events
     clock.tick(constants.FPS)     ## will make the loop run at the same speed all the time
     for event in pygame.event.get():        # gets all the events which have occured till now and keeps tab of them.
@@ -86,13 +90,18 @@ while running:
             
             
             lines.move()
-            
+            newmidline = CenterLines(screen, lines.position, lines.lastposition)
+            if newmidline.slope not in midlines:
+                midlines.append(newmidline.slope)
+            print(midlines)
+            print(newmidline.slope)
             # static_sprites.add(lines.listofstatic[-1])
             # collidecheck(whichbranch)
 
 
          
     if splitcheck == 25:
+        
         randomindex = random.randint(0,3)
         randomindex2 = random.randint(0,len(branches[randomindex])-1)
         splitcheck = 0
@@ -106,9 +115,18 @@ while running:
         
         newlist.append(Lines(color=colors[randomindex], radius=4, startposx=branches[randomindex][randomindex2].position[0], startposy=branches[randomindex][randomindex2].position[1], trajectory_angle=newangle1))
         newlist.append(Lines(color=colors[randomindex], radius=4, startposx=branches[randomindex][randomindex2].position[0], startposy=branches[randomindex][randomindex2].position[1], trajectory_angle=newangle2))
+        
 
+        # branch_split_coords[randomindex].append(branches[randomindex][randomindex2].position)
+        
+        # pygame.draw.line(screen, constants.GOLD, branch_split_coords[randomindex][-1], branch_split_coords[randomindex][-2])
+        for item in newlist:
+            item.lastposition = branches[randomindex][randomindex2].position
+            pygame.draw.line(screen, constants.GOLD, item.position, item.lastposition)
+        
         branches[randomindex][randomindex2:randomindex2+1] = newlist
         vector_sprites.add(branches[randomindex][::1])
+
 
         
 

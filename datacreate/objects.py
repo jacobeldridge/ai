@@ -25,7 +25,13 @@ class Static(pygame.sprite.Sprite):
 
             return None
 
-        
+class CenterLines(pygame.sprite.Sprite): 
+    def __init__(self, surface, start, end):
+        pygame.sprite.Sprite.__init__(self)
+        pygame.draw.line(surface, constants.GOLD, start, end)
+        self.start = start
+        self.end = end
+        self.slope = round((end[1]-start[1])/(end[0]-start[0]),3)
 class Lines(pygame.sprite.Sprite):
     def __init__(self, color, radius, startposx, startposy, trajectory_angle):
         #create obj
@@ -40,6 +46,7 @@ class Lines(pygame.sprite.Sprite):
         self.position = vec(startposx, startposy)
         self.placesivebeen.append(self.position)
         self.rect = self.image.get_rect(center=self.position)
+        self.lastposition = (ZEROX, ZEROY)
         
         #create static to be left
 
@@ -47,6 +54,7 @@ class Lines(pygame.sprite.Sprite):
         
         # newstatic = Static(shape="circle", circlex=self.position[0], circley=self.position[1], radius=self.radius)
         # self.listofstatic.append(newstatic)
+        
         self.position += (math.cos(self.angle)/constants.K, math.sin(self.angle)/constants.K)
         
         self.rect.center = self.position
